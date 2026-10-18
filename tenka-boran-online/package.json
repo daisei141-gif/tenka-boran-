@@ -1,0 +1,14 @@
+{
+  "name": "tenka-boran-online",
+  "version": "1.0.0",
+  "private": true,
+  "description": "戦国 天下謀乱 ― 友達とオンライン対戦できる身分推理カードゲーム",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": { "node": ">=18" },
+  "dependencies": {
+    "ws": "8.18.0"
+  }
+}
