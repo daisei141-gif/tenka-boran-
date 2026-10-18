@@ -3,6 +3,7 @@ services:
     name: tenka-boran
     runtime: node
     plan: free
+    rootDir: tenka-boran-online
     buildCommand: npm install
     startCommand: npm start
     healthCheckPath: /healthz
