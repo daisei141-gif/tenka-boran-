@@ -340,6 +340,9 @@ button{font-family:inherit;color:inherit}
 .pick .row{display:flex;gap:12px;align-items:center}
 .pick .gn{font-family:var(--f-brush);font-size:29px;line-height:1.1;white-space:nowrap}
 .pick .row>div{min-width:0}
+.pick .gn{overflow:hidden;text-overflow:clip}
+.pick .gn.l5{font-size:24px}
+.pick .gn.l6{font-size:20px}
 .pick .pq{align-self:stretch;font-size:16.5px}
 .pick .pq small{font-size:12px}
 .pick .skill{font-size:15px;color:#d9deec;line-height:1.55}
@@ -455,6 +458,8 @@ button{font-family:inherit;color:inherit}
     align-items:center;justify-items:start;text-align:left;gap:1px 7px;padding:5px 7px;border-radius:9px}
   .seat .portrait{grid-area:p}
   .seat .sname{grid-area:n;font-size:14.5px;margin:0;max-width:100%}
+  .seat .sname.l5{font-size:13px}
+  .seat .sname.l6{font-size:11.5px}
   .seat .hp{grid-area:h;justify-content:flex-start}
   .seat .hp i{width:7px;height:7px}
   .seat .fan{grid-area:f;height:24px;width:70px;margin:0;justify-content:flex-start}
@@ -538,6 +543,8 @@ button{font-family:inherit;color:inherit}
   .picks{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
   .pick{--ps:46px;padding:8px;gap:4px}
   .pick .gn{font-size:19px}
+  .pick .gn.l5{font-size:16px}
+  .pick .gn.l6{font-size:14px}
   .pick .skill,.pick .pq,.pq{font-size:12.5px}
   .pick .pq small{font-size:10.5px}
   .lead{font-size:12px}
@@ -1981,7 +1988,7 @@ function renderNow(){
     const d = (me.alive && p.alive && me.gen) ? dist(me,p) : null;
     return `<div class="seat ${live&&p===curP?'active':''} ${isT?'target':''} ${p.alive?'':'dead'}" data-seat="${p.seat}" ${isT?'role="button" tabindex="0"':''}>
       ${portrait(p.gen,{badge:badgeHtml(p,me), dead:!p.alive})}
-      <div class="sname" data-gtip="${p.seat}">${p.gen.name}</div><div class="sskill" data-gtip="${p.seat}">【${p.gen.skill}】</div>${p.pname?`<div class="pname">${String(p.pname).replace(/[&<>"]/g,"")}</div>`:''}
+      <div class="sname ${p.gen.name.length>=6?'l6':p.gen.name.length>=5?'l5':''}" data-gtip="${p.seat}">${p.gen.name}</div><div class="sskill" data-gtip="${p.seat}">【${p.gen.skill}】</div>${p.pname?`<div class="pname">${String(p.pname).replace(/[&<>"]/g,"")}</div>`:''}
       ${hpPips(p)}
       ${p.alive?fanHtml(p.hand.length):''}
       ${minisHtml(p)}
@@ -2262,7 +2269,7 @@ function openGeneralModal(spec){
     <h2>あなたは【${ROLES[me.role].name}】</h2>
     <p class="lead">${ROLES[me.role].goal}${me.role==='lord'?' 体力上限+1、最初の手番はあなたです。':' 身分は討ち死にするまで隠されます。'}</p>
     <div class="picks">${spec.options.map((g,i)=>`<button class="pick" data-gen="${i}">
-      <div class="row">${portrait(g)}<div><div class="ep">${g.epi}</div><div class="gn">${g.name}</div></div></div>
+      <div class="row">${portrait(g)}<div><div class="ep">${g.epi}</div><div class="gn ${g.name.length>=6?'l6':g.name.length>=5?'l5':''}">${g.name}</div></div></div>
       <div class="skill">体力 ${g.hp}${me.role==='lord'?'+1':''}</div>
       <div class="skill"><b>【${g.skill}】</b>${g.sdesc}</div>
       <div class="pq">「${g.quote}」<small>${g.qsrc}</small></div></button>`).join('')}</div>`);
