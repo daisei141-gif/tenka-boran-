@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="description" content="戦国武将が身分を隠して戦う、裏切りと推理の合戦カードゲーム。友達と最大5人でオンライン対戦。">
 <meta property="og:title" content="戦国 天下謀乱">
 <meta property="og:description" content="謀反人は誰だ。友達と遊べる戦国身分推理カードゲーム。">
@@ -143,7 +143,7 @@ button{font-family:inherit;color:inherit}
 .say.good::before{border-color:#2a7048}
 @media (max-width:480px){.say{font-size:15px;padding:5px 10px}.say.hot{font-size:17px}}
 .cutin{position:fixed;left:0;right:0;top:50%;transform:translateY(-50%);height:clamp(230px,40vw,340px);display:flex;align-items:center;justify-content:center;gap:clamp(22px,5vw,56px);padding:0 max(16px,env(safe-area-inset-left,0px));z-index:18}
-.cutin .ci-band{position:absolute;left:-5%;right:-5%;top:0;bottom:0;transform:skewY(-6deg);transform-origin:left center;
+.cutin .ci-band{position:absolute;left:-5%;right:-5%;top:-4%;bottom:-4%;transform:skewY(-4deg);transform-origin:center center;
   background:linear-gradient(90deg,rgba(9,13,26,.96),rgba(30,22,10,.96) 50%,rgba(9,13,26,.96));border-top:2px solid var(--gold);border-bottom:2px solid var(--gold);box-shadow:0 0 40px rgba(0,0,0,.8)}
 .cutin .ci-p{--ps:clamp(110px,30vw,180px);position:relative}
 .cutin .ci-p .portrait{box-shadow:0 0 0 3px var(--gold-hi),0 0 0 7px rgba(12,18,34,.9),0 0 0 9px var(--gold),0 0 40px rgba(243,214,140,.4)}
@@ -152,7 +152,9 @@ button{font-family:inherit;color:inherit}
 .cutin b{font-family:var(--f-brush);font-weight:400;font-size:clamp(24px,6vw,36px);line-height:1.1;color:var(--gold-hi)}
 .cutin q{font-family:var(--f-brush);font-size:clamp(17px,4.4vw,28px);line-height:1.45;color:var(--paper);quotes:"「" "」";text-wrap:balance}
 .cutin small{font-size:11px;color:var(--muted)}
-.cutin q.long{font-size:clamp(15px,3.4vw,22px)}
+.cutin q.long{font-size:clamp(15px,3.2vw,22px)}
+.cutin q.xl{font-size:clamp(14px,2.7vw,19px)}
+.cutin .ci-t{max-width:min(480px,50vw)}
 .pq{font-family:var(--f-brush);font-size:14px;line-height:1.5;color:var(--paper);border-top:1px dashed var(--line);padding-top:6px;margin-top:2px}
 .pq small{display:block;font-family:var(--f-body);font-size:10.5px;color:var(--muted)}
 .rquote{font-family:var(--f-brush);font-size:16px;line-height:1.5;color:var(--paper);max-width:30em;text-wrap:balance}
@@ -164,6 +166,13 @@ button{font-family:inherit;color:inherit}
 .jc.j-shuen{background:#9b2c4b}.jc.j-hyourou{background:#6b5a22}.jc.j-rakurai{background:#2d4a92;box-shadow:0 0 0 1px #f3d68c,0 0 10px rgba(243,214,140,.6)}
 .minis{display:flex;gap:5px;justify-content:center;flex-wrap:wrap;min-height:0;margin-top:2px}
 .minis.empty{display:none}
+/* 卓の高さを固定して、装備や判定札が増えても画面が伸び縮みしないようにする */
+.seat .minis{flex-wrap:nowrap;height:48px;gap:3px;align-items:flex-start}
+.seat .minis.empty{display:flex;visibility:hidden}
+.seat .mini{flex:0 1 34px;min-width:18px}
+.me .minis{flex-wrap:nowrap}
+.seat .fan.gone{visibility:hidden}
+.prompt{min-height:84px}
 .mini{--mw:34px;position:relative;width:var(--mw);height:calc(var(--mw)*1.36);padding:0;border-radius:4px;cursor:pointer;flex:0 0 auto;
   background:linear-gradient(160deg,var(--paper),var(--paper-2));border:1px solid var(--gold);box-shadow:0 2px 5px rgba(0,0,0,.7);overflow:hidden}
 .mini img{position:absolute;left:2px;right:2px;top:2px;bottom:12px;width:calc(100% - 4px);height:calc(100% - 14px);object-fit:contain}
@@ -186,13 +195,18 @@ button{font-family:inherit;color:inherit}
 
 /* ── 中央 ── */
 .table{--sw:clamp(100px,24vw,236px);flex:1;display:grid;grid-template-columns:var(--sw) minmax(0,1fr) minmax(0,1fr) var(--sw);
-  grid-template-areas:". tl tr ." "l arena arena r";gap:8px 6px;align-items:start;align-content:start}
+  grid-template-areas:"l tl tr r" "l arena arena r";gap:8px 6px;align-items:start;align-content:start}
 .pos{min-width:0}
 .pos .seat{height:100%}
 .pos-tl{grid-area:tl;justify-self:center;width:min(var(--sw),100%)}
 .pos-tr{grid-area:tr;justify-self:center;width:min(var(--sw),100%)}
-.pos-l{grid-area:l;margin-top:10px}
-.pos-r{grid-area:r;margin-top:10px}
+.pos-l{grid-area:l;align-self:stretch}
+.pos-r{grid-area:r;align-self:stretch}
+.pos-l .seat,.pos-r .seat{height:100%;justify-content:center;--ps:104px}
+.pos-l .seat .sname,.pos-r .seat .sname{font-size:23px}
+.table{align-content:stretch}
+.arena{align-self:stretch}
+.arena .board{flex:1}
 .arena{grid-area:arena;display:flex;flex-direction:column;gap:6px;min-width:0}
 .arena .board{grid-template-columns:auto auto minmax(0,1fr) minmax(0,1.15fr);min-height:170px}
 @media (max-width:899px){
@@ -221,7 +235,7 @@ button{font-family:inherit;color:inherit}
   .game .me .mehead{display:grid;grid-template-columns:auto minmax(0,1fr);gap:6px 12px;align-items:center}
   .game .me .mehead .who{grid-column:1 / -1}
   .game .me .mestat{grid-column:2;grid-row:1;align-items:flex-start}
-  .game .me .hand{min-height:118px}
+  .game .me .hand{min-height:0}
 }
 @media (max-width:640px){ .game .me{--ps:52px;padding:10px;gap:8px} .mehead .nm b{font-size:20px} .mehead .skill{font-size:11.5px} }
 .board{position:relative;display:grid;grid-template-columns:auto auto minmax(0,1fr) minmax(0,1.15fr);align-items:center;gap:14px;padding:12px 14px;border-radius:14px;min-height:150px;
@@ -282,9 +296,10 @@ button{font-family:inherit;color:inherit}
 .btn.red{background:linear-gradient(180deg,#f07a69,var(--red) 55%,#8d2419);border-color:#f59b8d;color:var(--paper);box-shadow:0 3px 0 #5e170f,0 6px 14px -6px rgba(0,0,0,.8)}
 .btn:disabled{opacity:.45;cursor:not-allowed}
 
-.hand{display:flex;gap:6px;overflow-x:auto;padding:14px 4px 6px;min-height:128px;align-items:flex-end;scrollbar-width:thin}
-.hand.tight .card{--cs:13.5px}
-.hand.tight .card + .card{margin-left:-10px}
+.hand{display:flex;gap:6px;overflow:hidden;padding:14px 4px 6px;height:124px;min-height:0;align-items:flex-end;flex:0 0 auto}
+/* 手札が多いときはスクロールせず、札を重ねて横幅に収める */
+.hand > .card + .card{margin-left:calc(-1 * var(--ov,0px))}
+.hand > .card.sel,.hand > .card:hover{z-index:3}
 .hint{font-size:12px;color:var(--muted);min-height:1.5em}
 
 /* ── 札 ── */
@@ -468,6 +483,9 @@ button{font-family:inherit;color:inherit}
   .seat .eqs{display:none}
   .seat .minis{grid-area:m;justify-content:flex-start;justify-self:start;flex-wrap:nowrap;gap:3px;margin:1px 0 0}
   .seat .minis.empty{display:none}
+  .seat .minis{height:auto}
+  .seat .fan.gone{display:none}
+  .prompt{min-height:0}
   .seat .mini{--mw:19px}
   .seat .mini b{display:none}
   .seat .mini img{bottom:2px;height:calc(100% - 4px)}
@@ -478,6 +496,8 @@ button{font-family:inherit;color:inherit}
   .seat .chip{font-size:9px;padding:2px 3px}
   .seat .dist{grid-area:d;font-size:9.5px;justify-self:end}
   .seat .sskill{display:none}
+  .seat .dist .dl{display:none}
+  .seat .dist{font-size:11px;font-weight:700;color:var(--gold-hi);background:rgba(0,0,0,.35);border-radius:999px;padding:0 6px}
   .seat.target::after{top:-7px;font-size:10px}
   .portrait .badge{width:16px;height:16px;font-size:11px;right:-4px;bottom:-3px}
   .arena{gap:3px}
@@ -510,9 +530,8 @@ button{font-family:inherit;color:inherit}
   .phint{overflow:hidden;text-overflow:ellipsis}
   .prompt .btn{font-size:13px}
   .btn{height:30px;padding:0 10px;font-size:12px;flex:0 0 auto}
-  .hand{min-height:0;padding:9px 2px 2px;gap:5px}
+  .hand{min-height:0;height:auto;flex:1 1 auto;padding:9px 2px 2px;gap:5px}
   .hand .card{--cs:11.5px}
-  .hand.tight .card{--cs:11px}
   .hint{display:none}
   .cutin{height:min(78vh,300px)}
   .cutin .ci-p{--ps:min(30vh,140px)}
@@ -582,7 +601,14 @@ button{font-family:inherit;color:inherit}
 /* 縦持ちのスマホ:画面全体を90度回して、常に横向きで見せる */
 #stage{position:relative;min-height:100%}
 /* 大きい画面では卓全体を拡大して画面いっぱいに使う */
-.game.fit{position:absolute;top:0;left:var(--fx0,0px);margin:0;max-width:none;width:var(--fw);min-height:var(--fh);transform:scale(var(--fz));transform-origin:0 0}
+.game.fit{position:absolute;top:0;left:var(--fx0,0px);margin:0;max-width:none;width:var(--fw);min-height:var(--fh);height:var(--fh);overflow:hidden;transform:scale(var(--fz));transform-origin:0 0}
+/* スマホ:画面を固定して、上下左右に動かない・拡大されないようにする */
+@media (orientation:landscape) and (max-height:540px), (orientation:portrait) and (max-width:600px){
+  html,body{height:100%;overflow:hidden;overscroll-behavior:none;touch-action:manipulation;-webkit-text-size-adjust:100%}
+  body{position:fixed;inset:0}
+  #stage{position:fixed;top:0;left:0;width:100%;height:100%;overflow:hidden}
+  #stage .game.fit.cfit{height:var(--fh);min-height:0}
+}
 @media (orientation:portrait) and (max-width:600px){
   html,body{height:100%;overflow:hidden}
   #stage{position:fixed;top:0;left:0;width:100vh;width:100dvh;height:100vw;min-height:0;overflow:hidden;
@@ -1150,7 +1176,7 @@ function lrect(el){
   const W=innerWidth; return {left:r.top, top:W-r.right, width:r.height, height:r.width, right:r.bottom, bottom:W-r.left};
 }
 // 大画面フィット:基準 1180×800 より大きい画面では卓を拡大し、余白なく画面いっぱいに広げる
-const FIT_W=1180, FIT_H=800, FIT_MAXW=1500;
+const FIT_W=1180, FIT_H=840, FIT_MAXW=99999;
 const COMPACT_MQ = HEADLESS ? null : matchMedia('(orientation:landscape) and (max-height:540px), (orientation:portrait) and (max-width:600px)');
 let FIT_Z=0; // いまの拡大率(0=拡大なし)
 function fitApply(g,z,W,H){
@@ -1161,19 +1187,38 @@ function fitApply(g,z,W,H){
 // 画面サイズが変わったときだけ倍率を決め直す(描き直しのたびに計算すると重くなる)
 function fitGame(){
   const g=document.getElementById('app'); if(!g) return;
+  const compact = rotated() || (COMPACT_MQ&&COMPACT_MQ.matches);
+  if(compact){
+    // スマホ:中身が画面より高いときだけ縮めて、ぴったり1画面に収める
+    g.classList.remove('fit','cfit'); FIT_Z=0;
+    const W=stageW(), H=stageH(); let z=1;
+    for(let i=0;i<5;i++){ const need=g.scrollHeight, have=g.clientHeight; if(need<=have+1) break; z=Math.max(.6, z*have/need*.99); fitApply(g,z,W,H); g.classList.add('cfit'); }
+    return;
+  }
+  g.classList.remove('cfit');
   const W=innerWidth, H=innerHeight;
-  if(rotated() || (COMPACT_MQ&&COMPACT_MQ.matches) || Math.min(W/FIT_W, H/FIT_H)<=1.02){ g.classList.remove('fit'); FIT_Z=0; return; }
   fitApply(g, Math.min(W/FIT_W, H/FIT_H), W, H); fitCheck();
 }
 // 描き直したあと:中身がはみ出したときだけ倍率を下げる(上げ直しはしないので、揺れない)
 function fitCheck(){
-  if(!FIT_Z) return; const g=document.getElementById('app'); if(!g) return;
+  const g=document.getElementById('app'); if(!g) return;
+  if(g.classList.contains('cfit') || ((rotated() || (COMPACT_MQ&&COMPACT_MQ.matches)) && g.scrollHeight>g.clientHeight+1)){
+    for(let i=0;i<3;i++){ const need=g.scrollHeight, have=g.clientHeight; if(need<=have+1) break; const z=Math.max(.6,(FIT_Z||1)*have/need*.99); fitApply(g,z,stageW(),stageH()); g.classList.add('cfit'); }
+    return;
+  }
+  if(!FIT_Z || (G && G.started && !G.over)) return; // 対戦中は倍率を変えない
   const W=innerWidth, H=innerHeight;
-  for(let i=0;i<3;i++){ const h=g.offsetHeight; if(h<=H/FIT_Z+1) break; const z=H/h; if(z<=1.02){ g.classList.remove('fit'); FIT_Z=0; return; } fitApply(g,z,W,H); }
+  for(let i=0;i<3;i++){ const h=g.offsetHeight; if(h<=H/FIT_Z+1) break; const z=H/h; fitApply(g,z,W,H); }
 }
 let _fitQ=false;
 function fitSoon(){ if(_fitQ) return; _fitQ=true; requestAnimationFrame(()=>{ _fitQ=false; fitGame(); }); }
-if(!HEADLESS){ addEventListener('resize', fitSoon); fitGame(); }
+if(!HEADLESS){ addEventListener('resize', fitSoon); addEventListener('orientationchange', ()=>setTimeout(fitGame,300)); fitGame();
+  // スマホで画面がずれたり拡大されたりしないようにする(手札と軍記の中だけはスクロールできる)
+  const phone=()=>rotated() || (COMPACT_MQ&&COMPACT_MQ.matches);
+  document.addEventListener('touchmove', e=>{ if(!phone()) return; if(e.touches.length>1){ e.preventDefault(); return; } if(!e.target.closest('.glog,.overlay,.loglist,.tip')) e.preventDefault(); }, {passive:false});
+  document.addEventListener('gesturestart', e=>e.preventDefault());
+  document.addEventListener('dblclick', e=>{ if(phone()) e.preventDefault(); });
+}
 function stageW(){ const st=document.getElementById('stage'); return rotated() && st ? st.clientWidth : innerWidth; }
 function stageH(){ const st=document.getElementById('stage'); return rotated() && st ? st.clientHeight : innerHeight; }
 function seatRect(p){
@@ -1306,12 +1351,12 @@ function fxDeal(p, n){
 function fxCutin(gen){
   if(HEADLESS || !$fx) return;
   const el=document.createElement('div'); el.className='cutin';
-  el.innerHTML=`<div class="ci-band"></div><div class="ci-p">${portrait(gen)}</div><div class="ci-t"><span class="ci-ep">${gen.epi}</span><b>${gen.name}</b><q class="${(UI.lastQuote=pickQuote(gen)).text.length>26?'long':''}">${UI.lastQuote.text}</q><small>${UI.lastQuote.src}</small></div>`;
+  el.innerHTML=`<div class="ci-band"></div><div class="ci-p">${portrait(gen)}</div><div class="ci-t"><span class="ci-ep">${gen.epi}</span><b>${gen.name}</b><q class="${(UI.lastQuote=pickQuote(gen)).text.length>34?'xl':UI.lastQuote.text.length>22?'long':''}">${UI.lastQuote.text}</q><small>${UI.lastQuote.src}</small></div>`;
   $fx.appendChild(el);
   const dur = UI.speed>500 ? 2700 : 1850;
   if(typeof el.animate!=='function' || REDUCED){ setTimeout(()=>el.remove(), dur); return; }
   el.animate([{opacity:0},{opacity:1,offset:.08},{opacity:1,offset:.88},{opacity:0}],{duration:dur}).onfinish=()=>el.remove();
-  el.querySelector('.ci-band').animate([{transform:'skewY(-6deg) scaleX(0)'},{transform:'skewY(-6deg) scaleX(1)',offset:.12},{transform:'skewY(-6deg) scaleX(1)'}],{duration:dur,easing:'cubic-bezier(.2,.8,.2,1)'});
+  el.querySelector('.ci-band').animate([{transform:'skewY(-4deg) scaleX(0)'},{transform:'skewY(-4deg) scaleX(1)',offset:.12},{transform:'skewY(-4deg) scaleX(1)'}],{duration:dur,easing:'cubic-bezier(.2,.8,.2,1)'});
   el.querySelector('.ci-p').animate([{transform:'translateX(-60vw) scale(.8)'},{transform:'translateX(0) scale(1)',offset:.16},{transform:'translateX(-1.5vw) scale(1)'}],{duration:dur,easing:'cubic-bezier(.2,.8,.2,1)'});
   el.querySelector('.ci-t').animate([{transform:'translateX(60vw)',opacity:0},{transform:'translateX(0)',opacity:1,offset:.2},{transform:'translateX(1.5vw)',opacity:1}],{duration:dur,easing:'cubic-bezier(.2,.8,.2,1)'});
 }
@@ -1990,9 +2035,9 @@ function renderNow(){
       ${portrait(p.gen,{badge:badgeHtml(p,me), dead:!p.alive})}
       <div class="sname ${p.gen.name.length>=6?'l6':p.gen.name.length>=5?'l5':''}" data-gtip="${p.seat}">${p.gen.name}</div><div class="sskill" data-gtip="${p.seat}">【${p.gen.skill}】</div>${p.pname?`<div class="pname">${String(p.pname).replace(/[&<>"]/g,"")}</div>`:''}
       ${hpPips(p)}
-      ${p.alive?fanHtml(p.hand.length):''}
+      ${p.alive?fanHtml(p.hand.length):'<div class="fan gone"></div>'}
       ${minisHtml(p)}
-      <div class="dist">${d!==null?`距離 ${d}`:p.alive?'':'討ち死に'}</div>
+      <div class="dist">${d!==null?`<span class="dl">距離 </span>${d}`:p.alive?'':'討ち死に'}</div>
     </div>`;
   });
   // 卓の配置(時計回り):次の手番(距離1)が左、その先が左上・右上、ひとつ前(距離1)が右
@@ -2085,7 +2130,11 @@ function renderNow(){
   cls('r-hand', `hand ${me.hand.length>6?'tight':''}`); patch('r-hand', handHtml);
   patch('r-hint', hint);
 
-  fitCheck();
+  { const h=document.getElementById('r-hand'); if(h){ h.style.setProperty('--ov','0px'); const n=h.children.length;
+      if(n>1 && h.scrollWidth>h.clientWidth+1){ h.style.setProperty('--ov', ((h.scrollWidth-h.clientWidth)/(n-1)+1)+'px'); } } }
+  // 名前が枠からはみ出す武将だけ、文字を小さくして収める
+  for(const el of document.querySelectorAll('.seat .sname')){ if(el.scrollWidth>el.clientWidth+1){ const f=parseFloat(getComputedStyle(el).fontSize); el.style.fontSize=Math.max(9, f*el.clientWidth/el.scrollWidth*.98)+'px'; } }
+  if(G.started && UI.fitGame!==G.gameId){ UI.fitGame=G.gameId; fitGame(); } else fitCheck();
   if(glChanged){ const gl=document.getElementById('glog'); if(gl) gl.scrollTop = logAtEnd ? gl.scrollHeight : logTop; }
   if(spec && spec.mode==='general') openGeneralModal(spec);
   else if(spec && spec.mode==='zone') openZoneModal(spec);
