@@ -104,13 +104,13 @@ button{font-family:inherit;color:inherit}
 
 /* ── 敵陣 ── */
 .opps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
-.seat{--ps:58px;position:relative;display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 4px 8px;border-radius:12px;text-align:center;min-width:0;
+.seat{--ps:86px;position:relative;display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 4px 8px;border-radius:12px;text-align:center;min-width:0;
   background:linear-gradient(180deg,rgba(20,30,58,.78),rgba(8,12,24,.68));border:1px solid var(--line)}
 @media (min-width:640px){.seat{--ps:78px;padding:12px 8px 10px}}
-.seat .sname{font-family:var(--f-brush);font-size:15px;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;margin-top:4px}
+.seat .sname{font-family:var(--f-brush);font-size:20px;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;margin-top:4px}
 @media (min-width:640px){.seat .sname{font-size:19px}}
-.seat .dist{font-size:10.5px;color:var(--muted);font-variant-numeric:tabular-nums}
-.seat .sskill{font-size:11.5px;font-weight:700;color:var(--gold-hi);line-height:1.2;cursor:help;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;text-decoration:underline dotted rgba(243,214,140,.5);text-underline-offset:3px}
+.seat .dist{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.seat .sskill{font-size:13px;font-weight:700;color:var(--gold-hi);line-height:1.2;cursor:help;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;text-decoration:underline dotted rgba(243,214,140,.5);text-underline-offset:3px}
 .seat .portrait,.seat .sname{cursor:help}
 .seat.active{border-color:var(--gold);background:linear-gradient(180deg,rgba(138,103,34,.35),rgba(12,18,34,.55))}
 .seat.active .portrait{animation:aura 1.4s ease-in-out var(--ad14,0s) infinite}
@@ -185,7 +185,7 @@ button{font-family:inherit;color:inherit}
 .chip{font-size:10px;line-height:1;padding:3px 5px;border-radius:4px;background:rgba(216,178,90,.16);color:var(--gold-hi);border:1px solid rgba(216,178,90,.35);white-space:nowrap}
 
 /* ── 中央 ── */
-.table{--sw:clamp(86px,23vw,196px);flex:1;display:grid;grid-template-columns:var(--sw) minmax(0,1fr) minmax(0,1fr) var(--sw);
+.table{--sw:clamp(100px,24vw,236px);flex:1;display:grid;grid-template-columns:var(--sw) minmax(0,1fr) minmax(0,1fr) var(--sw);
   grid-template-areas:". tl tr ." "l arena arena r";gap:8px 6px;align-items:start;align-content:start}
 .pos{min-width:0}
 .pos .seat{height:100%}
@@ -206,8 +206,8 @@ button{font-family:inherit;color:inherit}
 }
 @media (max-width:640px){
   .table{gap:6px 4px}
-  .seat{--ps:50px;padding:8px 3px 6px;gap:3px}
-  .seat .sname{font-size:13px}
+  .seat{--ps:60px;padding:8px 3px 6px;gap:3px}
+  .seat .sname{font-size:15px}
   .seat .hp i{width:8px;height:8px}
   .fan{height:36px}.fan i{width:19px;height:27px;margin-left:-9.5px}.fan b{margin-left:15px;font-size:11px;height:18px;line-height:18px;min-width:18px}
   .seat .dist{font-size:10px}
@@ -334,15 +334,19 @@ button{font-family:inherit;color:inherit}
 .modal p{margin:0}
 .lead{color:var(--muted)}
 .picks{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}
-.pick{--ps:58px;display:flex;flex-direction:column;align-items:flex-start;gap:6px;padding:14px;border-radius:12px;text-align:left;cursor:pointer;
+.pick{--ps:78px;display:flex;flex-direction:column;align-items:flex-start;gap:6px;padding:14px;border-radius:12px;text-align:left;cursor:pointer;
   background:rgba(9,13,26,.5);border:1px solid var(--line)}
 .pick:hover{border-color:var(--gold);transform:translateY(-2px)}
 .pick .row{display:flex;gap:12px;align-items:center}
-.pick .gn{font-family:var(--f-brush);font-size:23px;line-height:1.1;white-space:nowrap}
+.pick .gn{font-family:var(--f-brush);font-size:29px;line-height:1.1;white-space:nowrap}
 .pick .row>div{min-width:0}
-.pick .pq{align-self:stretch}
+.pick .pq{align-self:stretch;font-size:16.5px}
+.pick .pq small{font-size:12px}
+.pick .skill{font-size:15px;color:#d9deec;line-height:1.55}
 .overlay[data-kind="general"] .modal{max-width:880px}
-.pick .ep{font-size:11.5px;color:var(--gold);letter-spacing:.08em}
+.overlay[data-kind="general"] .lead{font-size:15px;color:#d3d8ea}
+.overlay[data-kind="general"] h2{font-size:30px}
+.pick .ep{font-size:13px;color:var(--gold);letter-spacing:.08em}
 .hero{display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center}
 .tlogo{display:flex;align-items:center;gap:clamp(8px,2.4vw,16px);font-size:clamp(54px,15.5vw,96px)}
 .tlogo .seal.big{font-size:.36em;padding:.22em .16em;margin:0;vertical-align:0;transform:rotate(-4deg);box-shadow:inset 0 0 0 .08em rgba(241,232,208,.6),0 0 0 .06em var(--ink-red),0 6px 18px rgba(0,0,0,.5)}
@@ -447,10 +451,10 @@ button{font-family:inherit;color:inherit}
     grid-template-areas:"tl arena tr" "l arena r";grid-template-rows:auto auto;gap:4px 8px;flex:0 0 auto}
   .pos-tl,.pos-tr{width:auto;justify-self:stretch}
   .pos-l,.pos-r{margin-top:0}
-  .seat{--ps:40px;display:grid;grid-template-columns:auto minmax(0,1fr) auto;grid-template-areas:"p n d" "p h h" "p f f" "p m m";
+  .seat{--ps:50px;display:grid;grid-template-columns:auto minmax(0,1fr) auto;grid-template-areas:"p n d" "p h h" "p f f" "p m m";
     align-items:center;justify-items:start;text-align:left;gap:1px 7px;padding:5px 7px;border-radius:9px}
   .seat .portrait{grid-area:p}
-  .seat .sname{grid-area:n;font-size:13px;margin:0;max-width:100%}
+  .seat .sname{grid-area:n;font-size:14.5px;margin:0;max-width:100%}
   .seat .hp{grid-area:h;justify-content:flex-start}
   .seat .hp i{width:7px;height:7px}
   .seat .fan{grid-area:f;height:24px;width:70px;margin:0;justify-content:flex-start}
@@ -532,9 +536,10 @@ button{font-family:inherit;color:inherit}
   .modal{gap:10px;padding:14px 16px}
   .modal h2{font-size:22px}
   .picks{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
-  .pick{--ps:40px;padding:8px;gap:4px}
-  .pick .gn{font-size:17px}
-  .pick .skill,.pq{font-size:11px}
+  .pick{--ps:46px;padding:8px;gap:4px}
+  .pick .gn{font-size:19px}
+  .pick .skill,.pick .pq,.pq{font-size:12.5px}
+  .pick .pq small{font-size:10.5px}
   .lead{font-size:12px}
 }
 @media (orientation:landscape) and (max-height:540px), (orientation:portrait) and (max-width:600px){
