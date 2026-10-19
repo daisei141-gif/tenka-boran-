@@ -190,7 +190,7 @@ button{font-family:inherit;color:inherit}
 .peekback{display:none;position:fixed;z-index:25;left:50%;top:max(10px,env(safe-area-inset-top,0px));transform:translateX(-50%);box-shadow:0 6px 18px rgba(0,0,0,.7)}
 #modal-root.peek .overlay{opacity:0;pointer-events:none}
 #modal-root.peek .peekback{display:inline-flex}
-.arrowfx{position:absolute;left:0;top:0;pointer-events:none;overflow:visible;z-index:14;filter:drop-shadow(0 0 6px rgba(0,0,0,.6))}
+.arrowfx{position:absolute;left:0;top:0;pointer-events:none;overflow:visible;z-index:14}
 .tip{position:fixed;z-index:19;max-width:250px;padding:9px 12px;border-radius:10px;background:var(--paper);color:var(--ink);border:2px solid var(--gold-deep);box-shadow:0 8px 20px rgba(0,0,0,.6);font-size:12.5px;line-height:1.5}
 .tip b{font-family:var(--f-brush);font-weight:400;font-size:17px;margin-right:6px}
 .tip small{font-size:10.5px;color:#6a5a3a}
@@ -1281,9 +1281,10 @@ function fxArrow(a,b,label,good){
   svg.innerHTML=`<defs><marker id="${id}" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="${col}"/></marker></defs>
     <line x1="${sx}" y1="${sy}" x2="${ex}" y2="${ey}" stroke="rgba(0,0,0,.55)" stroke-width="11" stroke-linecap="round"/>
     <line class="ln" x1="${sx}" y1="${sy}" x2="${ex}" y2="${ey}" stroke="${col}" stroke-width="6" stroke-linecap="round" marker-end="url(#${id})" stroke-dasharray="${len}" stroke-dashoffset="${len}"/>
-    ${label?`<g transform="translate(${(sx+ex)/2},${(sy+ey)/2})"><rect x="${-(label.length*9+12)}" y="-15" width="${label.length*18+24}" height="30" rx="15" fill="rgba(12,18,34,.92)" stroke="${col}" stroke-width="2"/><text text-anchor="middle" dominant-baseline="central" fill="#f6ecd2" font-size="17" font-weight="700" font-family="var(--f-brush)">${label}</text></g>`:''}`;
+    ${label?`<g transform="translate(${Math.min(Math.max((sx+ex)/2, label.length*9+16), stageW()-label.length*9-16)},${Math.min(Math.max((sy+ey)/2,20),stageH()-20)})"><rect x="${-(label.length*9+12)}" y="-15" width="${label.length*18+24}" height="30" rx="15" fill="rgba(12,18,34,.92)" stroke="${col}" stroke-width="2"/><text text-anchor="middle" dominant-baseline="central" fill="#f6ecd2" font-size="17" font-weight="700" font-family="var(--f-brush)">${label}</text></g>`:''}`;
+  for(const o of $fx.querySelectorAll('.arrowfx')) o.remove();
   $fx.appendChild(svg);
-  const dur=Math.max(1100, UI.speed*2.4);
+  const dur=Math.max(1000, UI.speed*1.6);
   svg.querySelector('.ln').animate([{strokeDashoffset:len},{strokeDashoffset:0}],{duration:Math.min(380,dur*.3),easing:'ease-out',fill:'forwards'});
   svg.animate([{opacity:1},{opacity:1,offset:.75},{opacity:0}],{duration:dur}).onfinish=()=>svg.remove();
 }
@@ -1392,6 +1393,7 @@ function fxCutin(gen){
 function fxBanner(text, cls=''){
   if(NET) return NET.fx('banner',[text,cls]);
   if(!canFx()) return;
+  for(const o of $fx.querySelectorAll('.banner')) o.remove(); // 前の帯が残っていたら消して、文字が重ならないようにする
   const el=document.createElement('div'); el.className='banner '+cls; el.innerHTML=`<span>${text}</span>`; $fx.appendChild(el);
   el.animate([{opacity:0,transform:'translateY(-50%) scaleY(.2)'},{opacity:1,transform:'translateY(-50%) scaleY(1)',offset:.15},{opacity:1,offset:.75},{opacity:0,transform:'translateY(-50%) scaleY(1.05)'}],
     {duration: UI.speed>800 ? 2000 : UI.speed>500 ? 1600 : UI.speed>200 ? 1000 : 600, easing:'ease-out'}).onfinish=()=>el.remove();
@@ -1422,8 +1424,7 @@ function removeFromHand(p,c){ const i=p.hand.indexOf(c); if(i>=0) p.hand.splice(
   if(i>=0 && !p.hand.length && p.alive && p.gen && p.gen.id==='naotora' && G.started){ const g=draw(p,1); if(g) log(`直虎【女城主】:1枚引く`,'sys'); } }
 function showField(card, from, to, note, fromDeck){
   G.field={card, from, to, note};
-  if(VIS){ sfx.card(); fxFly(card, fromDeck?null:from);
-    if(from && to && from!==to && !fromDeck){ const k=card.key; fxArrow(from,to,card.name, k==='heal'||k==='tea'||(note&&note.includes('薬'))); } }
+  if(VIS){ sfx.card(); fxFly(card, fromDeck?null:from); }
   render();
 }
 
@@ -1617,7 +1618,7 @@ function aiWantsKanpa(q,key,src,tgt,cancelled){
   return wants && (bad || q===src);
 }
 async function nullified(key, src, tgt, multi=false){
-  let cancelled=false;
+  let cancelled=false, lastQ=null;
   const name=CARD_DEFS[key].name;
   for(let round=0; round<8; round++){
     let played=null;
@@ -1635,7 +1636,10 @@ async function nullified(key, src, tgt, multi=false){
       } else use = aiWantsKanpa(q,key,src,tgt,cancelled) ? kc : null;
       if(!use) continue;
       removeFromHand(q,use); G.discard.push(use);
-      showField(use,q,tgt, cancelled ? '看破し返す' : `「${name}」を看破`); say(q,'kanpa','hot');
+      const foe = cancelled ? lastQ : (src || tgt);
+      showField(use,q,foe, cancelled ? `${lastQ?nm(lastQ):''}の看破を、看破し返す` : `${src?nm(src)+'の':''}「${name}」${tgt&&tgt!==src?`(${nm(tgt)}へ)`:''}を看破`); say(q,'kanpa','hot');
+      if(VIS){ fxBanner(cancelled ? `${q.gen.name} 看破返し!` : `${q.gen.name} 看破!`); if(foe && foe!==q) fxArrow(q, foe, cancelled?'看破返し':`看破 ✕ ${name}`); }
+      lastQ=q;
       log(`${nm(q)}は${cancelled?'看破し返した':`「${name}」を看破した`}`, 'big');
       if(!cancelled){ BAD_TRICKS.has(key) ? friendly(q,tgt) : hostile(q,tgt); }
       await wait(UI.speed*.7);
