@@ -469,6 +469,9 @@ button{font-family:inherit;color:inherit}
     grid-template-areas:"tl arena tr" "l arena r";grid-template-rows:auto auto;gap:4px 8px;flex:0 0 auto}
   .pos-tl,.pos-tr{width:auto;justify-self:stretch}
   .pos-l,.pos-r{margin-top:0}
+  .pos-l,.pos-r{align-self:start}
+  .pos-l .seat,.pos-r .seat{--ps:50px;height:auto;justify-content:start}
+  .pos-l .seat .sname,.pos-r .seat .sname{font-size:14.5px}
   .seat{--ps:50px;display:grid;grid-template-columns:auto minmax(0,1fr) auto;grid-template-areas:"p n d" "p h h" "p f f" "p m m";
     align-items:center;justify-items:start;text-align:left;gap:1px 7px;padding:5px 7px;border-radius:9px}
   .seat .portrait{grid-area:p}
