@@ -187,7 +187,8 @@ button{font-family:inherit;color:inherit}
 .mini:focus-visible{outline:2px solid var(--gold-hi)}
 @media (min-width:640px){.seat .mini{--mw:40px}.mini b{font-size:9.5px}}
 .me .minis{justify-content:flex-start}
-.peekback{display:none;position:fixed;z-index:25;left:50%;top:max(10px,env(safe-area-inset-top,0px));transform:translateX(-50%);box-shadow:0 6px 18px rgba(0,0,0,.7)}
+.peekback{display:none;position:fixed;z-index:25;left:50%;top:max(14px,env(safe-area-inset-top,0px));transform:translateX(-50%);height:auto!important;padding:16px 44px!important;font-size:22px!important;font-weight:900;letter-spacing:.12em;border-radius:14px;box-shadow:0 0 0 3px var(--gold-hi),0 8px 24px rgba(0,0,0,.8);animation:aim 1.2s ease-in-out infinite}
+@media (orientation:landscape) and (max-height:540px), (orientation:portrait) and (max-width:600px){ .peekback{padding:12px 32px!important;font-size:18px!important} }
 #modal-root.peek .overlay{opacity:0;pointer-events:none}
 #modal-root.peek .peekback{display:inline-flex}
 .arrowfx{position:absolute;left:0;top:0;pointer-events:none;overflow:visible;z-index:14}
