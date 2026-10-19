@@ -1268,8 +1268,13 @@ function fxSlash(p){
   el.animate([{transform:'rotate(-32deg) scaleX(0)',opacity:1},{transform:'rotate(-32deg) scaleX(1)',opacity:1,offset:.35},{transform:'rotate(-32deg) scaleX(1)',opacity:0}],{duration:520,easing:'ease-out'}).onfinish=()=>el.remove();
 }
 // 札を使った相手へ矢印を引く(誰に使ったか一目でわかるように)
-function fxArrow(a,b,label,good){
-  if(NET) return NET.fx('arrow',[a.seat,b.seat,label||'',!!good]);
+function fxArrowClear(){
+  if(NET) return NET.fx('arrowclear',[]);
+  if(!$fx) return; for(const o of $fx.querySelectorAll('.arrowfx')) o.animate([{opacity:1},{opacity:0}],{duration:250}).onfinish=()=>o.remove();
+}
+// keep=true:看破のやり取りが終わるまで消さない
+function fxArrow(a,b,label,good,keep){
+  if(NET) return NET.fx('arrow',[a.seat,b.seat,label||'',!!good,!!keep]);
   if(!canFx()) return; const ra=seatRect(a), rb=seatRect(b); if(!ra||!rb) return;
   const x1=ra.left+ra.width/2, y1=ra.top+ra.height/2, x2=rb.left+rb.width/2, y2=rb.top+rb.height/2;
   const dx=x2-x1, dy=y2-y1, L=Math.hypot(dx,dy); if(L<20) return;
@@ -1283,9 +1288,10 @@ function fxArrow(a,b,label,good){
     <line x1="${sx}" y1="${sy}" x2="${ex}" y2="${ey}" stroke="rgba(0,0,0,.55)" stroke-width="11" stroke-linecap="round"/>
     <line class="ln" x1="${sx}" y1="${sy}" x2="${ex}" y2="${ey}" stroke="${col}" stroke-width="6" stroke-linecap="round" marker-end="url(#${id})" stroke-dasharray="${len}" stroke-dashoffset="${len}"/>
     ${label?`<g transform="translate(${Math.min(Math.max((sx+ex)/2, label.length*9+16), stageW()-label.length*9-16)},${Math.min(Math.max((sy+ey)/2,20),stageH()-20)})"><rect x="${-(label.length*9+12)}" y="-15" width="${label.length*18+24}" height="30" rx="15" fill="rgba(12,18,34,.92)" stroke="${col}" stroke-width="2"/><text text-anchor="middle" dominant-baseline="central" fill="#f6ecd2" font-size="17" font-weight="700" font-family="var(--f-brush)">${label}</text></g>`:''}`;
-  for(const o of $fx.querySelectorAll('.arrowfx')) o.remove();
+  if(!keep) for(const o of $fx.querySelectorAll('.arrowfx')) o.remove();
   $fx.appendChild(svg);
   const dur=Math.max(1000, UI.speed*1.6);
+  if(keep){ svg.querySelector('.ln').animate([{strokeDashoffset:len},{strokeDashoffset:0}],{duration:380,easing:'ease-out',fill:'forwards'}); setTimeout(()=>svg.remove(), 20000); return; }
   svg.querySelector('.ln').animate([{strokeDashoffset:len},{strokeDashoffset:0}],{duration:Math.min(380,dur*.3),easing:'ease-out',fill:'forwards'});
   svg.animate([{opacity:1},{opacity:1,offset:.75},{opacity:0}],{duration:dur}).onfinish=()=>svg.remove();
 }
@@ -1639,7 +1645,7 @@ async function nullified(key, src, tgt, multi=false){
       removeFromHand(q,use); G.discard.push(use);
       const foe = cancelled ? lastQ : (src || tgt);
       showField(use,q,foe, cancelled ? `${lastQ?nm(lastQ):''}の看破を、看破し返す` : `${src?nm(src)+'の':''}「${name}」${tgt&&tgt!==src?`(${nm(tgt)}へ)`:''}を看破`); say(q,'kanpa','hot');
-      if(VIS){ fxBanner(cancelled ? `${q.gen.name} 看破返し!` : `${q.gen.name} 看破!`); if(foe && foe!==q) fxArrow(q, foe, cancelled?'看破返し':`看破 ✕ ${name}`); }
+      if(VIS){ fxBanner(cancelled ? `${q.gen.name} 看破返し!` : `${q.gen.name} 看破!`); if(foe && foe!==q) fxArrow(q, foe, cancelled?'看破返し':`看破 ✕ ${name}`, false, true); }
       lastQ=q;
       log(`${nm(q)}は${cancelled?'看破し返した':`「${name}」を看破した`}`, 'big');
       if(!cancelled){ BAD_TRICKS.has(key) ? friendly(q,tgt) : hostile(q,tgt); }
@@ -1650,6 +1656,7 @@ async function nullified(key, src, tgt, multi=false){
     cancelled=!cancelled;
   }
   if(cancelled) log(`「${name}」は無効になった`,'sys');
+  if(lastQ && VIS){ await wait(UI.speed*.5); fxArrowClear(); }
   return cancelled;
 }
 async function doAoe(src, kind, title, key){
@@ -2276,7 +2283,8 @@ const NETC = (()=>{
         case 'fly': fxFly(a[0], a[1]==null?null:P(a[1])); break;
         case 'float': fxFloat(P(a[0]),a[1],a[2]); break;
         case 'slash': fxSlash(P(a[0])); break;
-        case 'arrow': setTimeout(()=>fxArrow(P(a[0]),P(a[1]),a[2],a[3]),60); break;
+        case 'arrow': setTimeout(()=>fxArrow(P(a[0]),P(a[1]),a[2],a[3],a[4]),60); break;
+        case 'arrowclear': setTimeout(fxArrowClear,60); break;
         case 'shake': if(a[0]===st.you) fxShake(); break;
         case 'banner': fxBanner(a[0],a[1]); break;
         case 'turn': { const mine=a[0]===st.you; sfx.turn(); fxBanner(mine?'あなたの手番':`${P(a[0]).gen.name}の手番`, mine?'mine':''); break; }
