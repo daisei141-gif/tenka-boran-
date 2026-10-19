@@ -187,6 +187,10 @@ button{font-family:inherit;color:inherit}
 .mini:focus-visible{outline:2px solid var(--gold-hi)}
 @media (min-width:640px){.seat .mini{--mw:40px}.mini b{font-size:9.5px}}
 .me .minis{justify-content:flex-start}
+.peekback{display:none;position:fixed;z-index:25;left:50%;top:max(10px,env(safe-area-inset-top,0px));transform:translateX(-50%);box-shadow:0 6px 18px rgba(0,0,0,.7)}
+#modal-root.peek .overlay{opacity:0;pointer-events:none}
+#modal-root.peek .peekback{display:inline-flex}
+.arrowfx{position:absolute;left:0;top:0;pointer-events:none;overflow:visible;z-index:14;filter:drop-shadow(0 0 6px rgba(0,0,0,.6))}
 .tip{position:fixed;z-index:19;max-width:250px;padding:9px 12px;border-radius:10px;background:var(--paper);color:var(--ink);border:2px solid var(--gold-deep);box-shadow:0 8px 20px rgba(0,0,0,.6);font-size:12.5px;line-height:1.5}
 .tip b{font-family:var(--f-brush);font-weight:400;font-size:17px;margin-right:6px}
 .tip small{font-size:10.5px;color:#6a5a3a}
@@ -505,7 +509,7 @@ button{font-family:inherit;color:inherit}
   .portrait .badge{width:16px;height:16px;font-size:11px;right:-4px;bottom:-3px}
   .arena{gap:3px}
   .arena .board{grid-template-columns:auto auto minmax(0,.9fr) minmax(0,1.2fr);justify-items:start;text-align:left;gap:10px;padding:6px 10px;min-height:0}
-  .arena .glog{width:auto;height:0;min-height:100%;border-top:0;border-left:1px solid var(--line);padding:0 2px 0 8px;font-size:10.5px;line-height:1.4}
+  .arena .glog{width:auto;height:0;min-height:100%;border-top:0;border-left:1px solid var(--line);padding:0 2px 0 8px;font-size:11.5px;line-height:1.4}
   .arena .deck{display:flex;font-size:9.5px}
   .arena .deck .cardback{font-size:9px}
   .arena .slot{font-size:10px;min-width:0}
@@ -522,7 +526,8 @@ button{font-family:inherit;color:inherit}
   .game .me .mehead .who{grid-column:1 / -1;gap:1px}
   .game .me .mehead .nm b{font-size:16px}
   .game .me .mehead .nm .role{font-size:10.5px}
-  .game .me .mehead .skill{font-size:10px;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .game .me .mehead .skill{font-size:11.5px;line-height:1.4;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;color:#d3d8ea}
+  .game .me .mehead .skill + .skill{display:none}
   .game .me .mestat{grid-column:2;grid-row:1;align-items:flex-start;flex-direction:column;gap:3px;width:auto}
   .game .me .mestat .hp i{width:9px;height:9px}
   .mright{gap:4px;min-height:0}
@@ -534,7 +539,7 @@ button{font-family:inherit;color:inherit}
   .prompt .btn{font-size:13px}
   .btn{height:30px;padding:0 10px;font-size:12px;flex:0 0 auto}
   .hand{min-height:0;height:auto;flex:1 1 auto;padding:9px 2px 2px;gap:5px}
-  .hand .card{--cs:11.5px}
+  .hand .card{--cs:var(--hcs,11.5px)}
   .hint{display:none}
   .cutin{height:min(78vh,300px)}
   .cutin .ci-p{--ps:min(30vh,140px)}
@@ -1261,6 +1266,27 @@ function fxSlash(p){
   el.style.width=w+'px'; el.style.left=(r.left+r.width/2-w*.45)+'px'; el.style.top=(r.top+r.height*.7)+'px'; $fx.appendChild(el);
   el.animate([{transform:'rotate(-32deg) scaleX(0)',opacity:1},{transform:'rotate(-32deg) scaleX(1)',opacity:1,offset:.35},{transform:'rotate(-32deg) scaleX(1)',opacity:0}],{duration:520,easing:'ease-out'}).onfinish=()=>el.remove();
 }
+// 札を使った相手へ矢印を引く(誰に使ったか一目でわかるように)
+function fxArrow(a,b,label,good){
+  if(NET) return NET.fx('arrow',[a.seat,b.seat,label||'',!!good]);
+  if(!canFx()) return; const ra=seatRect(a), rb=seatRect(b); if(!ra||!rb) return;
+  const x1=ra.left+ra.width/2, y1=ra.top+ra.height/2, x2=rb.left+rb.width/2, y2=rb.top+rb.height/2;
+  const dx=x2-x1, dy=y2-y1, L=Math.hypot(dx,dy); if(L<20) return;
+  const ux=dx/L, uy=dy/L, r1=ra.width/2+6, r2=rb.width/2+10;
+  const sx=x1+ux*r1, sy=y1+uy*r1, ex=x2-ux*r2, ey=y2-uy*r2, len=Math.hypot(ex-sx,ey-sy);
+  const col = good ? '#7be0a3' : '#ff6a55';
+  const NS='http://www.w3.org/2000/svg'; const svg=document.createElementNS(NS,'svg'); svg.setAttribute('class','arrowfx');
+  svg.setAttribute('width',stageW()); svg.setAttribute('height',stageH());
+  const id='ah'+Math.random().toString(36).slice(2,7);
+  svg.innerHTML=`<defs><marker id="${id}" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="${col}"/></marker></defs>
+    <line x1="${sx}" y1="${sy}" x2="${ex}" y2="${ey}" stroke="rgba(0,0,0,.55)" stroke-width="11" stroke-linecap="round"/>
+    <line class="ln" x1="${sx}" y1="${sy}" x2="${ex}" y2="${ey}" stroke="${col}" stroke-width="6" stroke-linecap="round" marker-end="url(#${id})" stroke-dasharray="${len}" stroke-dashoffset="${len}"/>
+    ${label?`<g transform="translate(${(sx+ex)/2},${(sy+ey)/2})"><rect x="${-(label.length*9+12)}" y="-15" width="${label.length*18+24}" height="30" rx="15" fill="rgba(12,18,34,.92)" stroke="${col}" stroke-width="2"/><text text-anchor="middle" dominant-baseline="central" fill="#f6ecd2" font-size="17" font-weight="700" font-family="var(--f-brush)">${label}</text></g>`:''}`;
+  $fx.appendChild(svg);
+  const dur=Math.max(1100, UI.speed*2.4);
+  svg.querySelector('.ln').animate([{strokeDashoffset:len},{strokeDashoffset:0}],{duration:Math.min(380,dur*.3),easing:'ease-out',fill:'forwards'});
+  svg.animate([{opacity:1},{opacity:1,offset:.75},{opacity:0}],{duration:dur}).onfinish=()=>svg.remove();
+}
 function fxShake(p){
   if(NET) return NET.fx('shake',[p?p.seat:-1]);
   if(!canFx()) return; const g=document.getElementById('app');
@@ -1396,7 +1422,8 @@ function removeFromHand(p,c){ const i=p.hand.indexOf(c); if(i>=0) p.hand.splice(
   if(i>=0 && !p.hand.length && p.alive && p.gen && p.gen.id==='naotora' && G.started){ const g=draw(p,1); if(g) log(`直虎【女城主】:1枚引く`,'sys'); } }
 function showField(card, from, to, note, fromDeck){
   G.field={card, from, to, note};
-  if(VIS){ sfx.card(); fxFly(card, fromDeck?null:from); }
+  if(VIS){ sfx.card(); fxFly(card, fromDeck?null:from);
+    if(from && to && from!==to && !fromDeck){ const k=card.key; fxArrow(from,to,card.name, k==='heal'||k==='tea'||(note&&note.includes('薬'))); } }
   render();
 }
 
@@ -2134,6 +2161,7 @@ function renderNow(){
   patch('r-hint', hint);
 
   { const h=document.getElementById('r-hand'); if(h){ h.style.setProperty('--ov','0px'); const n=h.children.length;
+      if(rotated() || (COMPACT_MQ&&COMPACT_MQ.matches)){ h.style.setProperty('--hcs','11.5px'); const cs=Math.max(10, Math.min(16, (h.clientHeight-13)/6.9)); h.style.setProperty('--hcs', cs+'px'); }
       if(n>1 && h.scrollWidth>h.clientWidth+1){ h.style.setProperty('--ov', ((h.scrollWidth-h.clientWidth)/(n-1)+1)+'px'); } } }
   // 名前が枠からはみ出す武将だけ、文字を小さくして収める
   for(const el of document.querySelectorAll('.seat .sname')){ if(el.scrollWidth>el.clientWidth+1){ const f=parseFloat(getComputedStyle(el).fontSize); el.style.fontSize=Math.max(9, f*el.clientWidth/el.scrollWidth*.98)+'px'; } }
@@ -2243,6 +2271,7 @@ const NETC = (()=>{
         case 'fly': fxFly(a[0], a[1]==null?null:P(a[1])); break;
         case 'float': fxFloat(P(a[0]),a[1],a[2]); break;
         case 'slash': fxSlash(P(a[0])); break;
+        case 'arrow': setTimeout(()=>fxArrow(P(a[0]),P(a[1]),a[2],a[3]),60); break;
         case 'shake': if(a[0]===st.you) fxShake(); break;
         case 'banner': fxBanner(a[0],a[1]); break;
         case 'turn': { const mine=a[0]===st.you; sfx.turn(); fxBanner(mine?'あなたの手番':`${P(a[0]).gen.name}の手番`, mine?'mine':''); break; }
@@ -2313,8 +2342,10 @@ const NETC = (()=>{
 })();
 
 /* ===================== モーダル ===================== */
-function closeModal(){ if(HEADLESS) return; $modal.innerHTML=''; delete $modal.dataset.kind; }
-function showModal(kind, html, force){ if(!force && $modal.dataset.kind===kind) return; $modal.dataset.kind=kind; $modal.innerHTML=`<div class="overlay" data-kind="${kind}"><div class="modal" role="dialog" aria-modal="true">${html}</div></div>`; }
+function closeModal(){ if(HEADLESS) return; $modal.innerHTML=''; delete $modal.dataset.kind; $modal.classList.remove('peek'); }
+function showModal(kind, html, force){ if(!force && $modal.dataset.kind===kind) return; $modal.dataset.kind=kind; $modal.classList.remove('peek');
+  const peek = ['harvest','zone','victim'].includes(kind);
+  $modal.innerHTML=`<div class="overlay" data-kind="${kind}"><div class="modal" role="dialog" aria-modal="true">${html}${peek?'<div class="actions"><button class="btn ghost" data-act="peek">自分の手札を見る</button></div>':''}</div></div>${peek?'<button class="btn peekback" data-act="unpeek">選択に戻る</button>':''}`; }
 function openGeneralModal(spec){
   const me=G.players.find(p=>p.isHuman);
   showModal('general', `
@@ -2480,6 +2511,8 @@ if(!HEADLESS){
       const a=actEl.dataset.act;
       if(a==='new'){ ac(); return newGame(); }
       if(a==='title'){ return goTitle(); }
+      if(a==='peek'){ $modal.classList.add('peek'); return; }
+      if(a==='unpeek'){ $modal.classList.remove('peek'); return; }
       if(a==='bgm'){ UI.bgm=!UI.bgm; try{localStorage.setItem('sengoku-satsu-bgm',UI.bgm?'1':'0');}catch(_){} if(UI.bgm) Music.resume(); else Music.stop(); return UI.onTitle ? openTitle() : render(); }
       if(a==='rules') return openRules();
       if(a==='log') return openLog();
