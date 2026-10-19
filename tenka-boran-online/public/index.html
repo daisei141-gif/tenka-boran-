@@ -1656,7 +1656,7 @@ async function nullified(key, src, tgt, multi=false){
     cancelled=!cancelled;
   }
   if(cancelled) log(`「${name}」は無効になった`,'sys');
-  if(lastQ && VIS){ await wait(UI.speed*.5); fxArrowClear(); }
+  if(lastQ && VIS && !ARROW_HOLD){ await wait(UI.speed*.5); fxArrowClear(); }
   return cancelled;
 }
 async function doAoe(src, kind, title, key){
@@ -1755,6 +1755,7 @@ async function takeCardFrom(actor, target, verb){
   return card;
 }
 
+let ARROW_HOLD=false; // 計略の矢印を、その計略が終わるまで残す
 async function execPlay(p, card, target, asKey, extra){
   removeFromHand(p,card);
   const def=CARD_DEFS[card.key];
@@ -1767,6 +1768,9 @@ async function execPlay(p, card, target, asKey, extra){
   showField(card,p,target, (k!==card.key) ? `${card.name}を${CARD_DEFS[k].name}として` : null);
   if(k!==card.key && k!=='slash') log(`${nm(p)}は${card.name}を${CARD_DEFS[k].name}として使った${p.gen.id==='masamune'?'(独眼竜)':''}`,'sys');
   if(p.gen.id==='ginchiyo' && def.type==='trick' && k===card.key){ const g=draw(p,1); if(g) log(`誾千代【雷切】:1枚引く`,'sys'); }
+  const trickArrow = VIS && target && target!==p && (CARD_DEFS[k].type==='trick' || CARD_DEFS[k].type==='delay');
+  if(trickArrow){ ARROW_HOLD=true; fxArrow(p, target, CARD_DEFS[k].name, false, true); }
+  try{
   say(p, k, k==='slash'||k==='duel'||k==='raid'||k==='uprising'||k==='volley'||k==='rikan'||k==='hyourou' ? 'hot' : k==='heal'||k==='tea'||k==='housaku' ? 'good' : '');
   await wait(UI.speed*.45);
   switch(k){
@@ -1784,6 +1788,7 @@ async function execPlay(p, card, target, asKey, extra){
     case 'housaku': await doHarvest(p); break;
     case 'rikan': await doRikan(p, target, extra); break;
   }
+  } finally { if(trickArrow){ ARROW_HOLD=false; fxArrowClear(); } }
   render();
 }
 
@@ -2303,7 +2308,7 @@ const NETC = (()=>{
     if(!st.active){
       body=`
         <p class="lead">部屋を作って友達を招待するか、友達から聞いた合言葉で参加します。空いた席にはCPUが入ります(最大5人)。</p>
-        <label class="nf"><span>あなたの名前</span><input id="net-name" maxlength="10" value="${esc(name)}" placeholder="例:大聖" autocomplete="nickname"></label>
+        <label class="nf"><span>あなたの名前</span><input id="net-name" maxlength="10" value="${esc(name)}" placeholder="例:武将太郎" autocomplete="nickname"></label>
         <div class="netrow">
           <button class="btn" data-net="create">部屋を作る</button>
           <span class="or">または</span>
